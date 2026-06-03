@@ -1,7 +1,7 @@
 // api.js — Centraliza todas as chamadas para o backend
 // Importado em todas as páginas do frontend
 
-const API_BASE = 'https://organizador-de-leituras.vercel.app';
+const API_BASE = 'https://organizador-de-leituras.vercel.app/api';
 
 // ─── Objeto principal da API ──────────────────────────────────────────────────
 const api = {
