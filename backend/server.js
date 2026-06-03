@@ -11,7 +11,6 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// ✅ CORREÇÃO 1 — Liberar o domínio do Vercel no CORS
 app.use(cors({
   origin: '*' // Depois do deploy, troque pelo domínio exato do seu frontend
 }));
