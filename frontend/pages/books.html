@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meus Livros</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><img src="/frontend/img/book.jpg"></div>
+      <div class="sidebar-logo-text">
+        <span class="title">Organizador</span>
+        <span class="subtitle">de leituras</span>
+      </div>
+    </div>
+    <ul class="sidebar-nav">
+      <li class="nav-section-label">Menu</li>
+      <li><a href="dashboard.html" class="nav-item"><span class="nav-item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span class="nav-item-label">Dashboard</span></a></li>
+      <li><a href="books.html" class="nav-item active"><span class="nav-item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span class="nav-item-label">Meus Livros</span></a></li>
+      <li><a href="trails.html" class="nav-item"><span class="nav-item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span class="nav-item-label">Trilhas</span></a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <div class="sidebar-user-avatar" id="sidebarUserInit">?</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebarUserName">Usuário</div>
+        <div class="sidebar-user-role">Leitor</div>
+      </div>
+      <button class="sidebar-logout logout-btn" title="Sair">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="topbar">
+      <span class="topbar-title">Meus Livros</span>
+      <div class="topbar-actions">
+        <div class="topbar-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="searchInput" placeholder="Buscar livro ou autor...">
+        </div>
+        <button class="btn btn-primary btn-sm" id="addBookBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo livro
+        </button>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Biblioteca</h1>
+          <p class="page-subtitle" id="bookCount">Carregando...</p>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="filter-bar" role="group" aria-label="Filtrar por status">
+        <button class="filter-chip active" data-status="">Todos</button>
+        <button class="filter-chip" data-status="lendo">📖 Lendo</button>
+        <button class="filter-chip" data-status="concluido">✔ Concluídos</button>
+        <button class="filter-chip" data-status="quero_ler">🔖 Quero ler</button>
+        <button class="filter-chip" data-status="pausado">⏸ Pausados</button>
+      </div>
+
+      <!-- Books grid -->
+      <div id="booksContainer">
+        <div class="page-loading">
+          <div class="spinner"></div>
+          <span>Carregando livros...</span>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ===================== MODAL: ADD/EDIT BOOK ===================== -->
+<div class="modal-overlay" id="bookModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Adicionar Livro</h3>
+      <button class="modal-close" id="closeModal" aria-label="Fechar">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="bookForm" novalidate>
+        <input type="hidden" id="bookId">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+          <div class="form-group" style="grid-column:1/-1;">
+            <label class="form-label" for="fTitle">Título *</label>
+            <input class="form-control" id="fTitle" placeholder="Nome do livro" required>
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label class="form-label" for="fAuthor">Autor *</label>
+            <input class="form-control" id="fAuthor" placeholder="Nome do autor">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fGenre">Gênero</label>
+            <input class="form-control" id="fGenre" placeholder="Ex: Romance, Ficção...">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fStatus">Status</label>
+            <select class="form-control" id="fStatus">
+              <option value="quero_ler">🔖 Quero ler</option>
+              <option value="lendo">📖 Lendo</option>
+              <option value="concluido">✔ Concluído</option>
+              <option value="pausado">⏸ Pausado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fCurrentPage">Página atual</label>
+            <input class="form-control" id="fCurrentPage" type="number" min="0" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fTotalPages">Total de páginas</label>
+            <input class="form-control" id="fTotalPages" type="number" min="1" placeholder="Ex: 320">
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label class="form-label" for="fCoverUrl">URL da capa (opcional)</label>
+            <input class="form-control" id="fCoverUrl" placeholder="https://...">
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label class="form-label">Avaliação</label>
+            <div id="ratingInput" class="stars rating-input"></div>
+            <input type="hidden" id="fRating" value="0">
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label class="form-label" for="fNotes">Notas / Resenha</label>
+            <textarea class="form-control" id="fNotes" rows="3" placeholder="Suas anotações sobre o livro..."></textarea>
+          </div>
+        </div>
+        <p class="error-msg" id="bookFormErr" style="display:none;"></p>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelBook">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="deleteBookBtn" style="display:none;margin-right:auto;">Excluir</button>
+      <button class="btn btn-primary" id="saveBookBtn">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script>window.API_BASE = 'http://localhost:5000/api';</script>
+<script src="../js/api.js"></script>
+<script>
+requireAuth();
+initSidebarUser();
+
+let currentFilter = '';
+let currentRating = 0;
+let searchTimeout;
+
+/* ---- Load & Render ---- */
+async function loadBooks(status = '', search = '') {
+  const container = document.getElementById('booksContainer');
+  container.innerHTML = `<div class="page-loading"><div class="spinner"></div><span>Carregando...</span></div>`;
+
+  try {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    if (search) params.append('search', search);
+    params.append('limit', '50');
+
+    const res = await api.books.list(`?${params.toString()}`);
+    const books = res.data;
+
+    document.getElementById('bookCount').textContent = `${res.pagination.total} livro${res.pagination.total !== 1 ? 's' : ''}`;
+
+    if (books.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-state-icon">📚</span>
+          <h3>Nenhum livro encontrado</h3>
+          <p>${search ? 'Tente outra busca' : 'Comece adicionando seu primeiro livro'}</p>
+          <button class="btn btn-primary btn-sm" style="margin-top:.75rem;" onclick="openModal()">Adicionar livro</button>
+        </div>`;
+      return;
+    }
+
+    const statusLabels = { lendo:'Lendo', concluido:'Concluído', quero_ler:'Quero ler', pausado:'Pausado' };
+
+    container.innerHTML = `<div class="books-grid">${books.map(b => {
+      const pct = b.totalPages && b.currentPage ? Math.round((b.currentPage/b.totalPages)*100) : 0;
+      const stars = Array.from({length:5},(_,i) => `<span class="star${i < b.rating ? ' filled' : ''}">★</span>`).join('');
+      return `
+        <article class="book-card" role="article">
+          <div class="book-card-header">
+            <div class="book-cover">
+              ${b.coverUrl ? `<img src="${b.coverUrl}" alt="${b.title}" loading="lazy" onerror="this.parentElement.textContent='📖'">` : '📖'}
+            </div>
+            <div class="book-meta">
+              <div class="book-title">${escHtml(b.title)}</div>
+              <div class="book-author">${escHtml(b.author)}</div>
+              <div style="margin-top:.4rem;"><span class="badge badge-${b.status}">${statusLabels[b.status]||b.status}</span></div>
+              <div class="stars" style="margin-top:.35rem;">${stars}</div>
+            </div>
+          </div>
+          ${b.genre ? `<p style="font-size:.78rem;color:var(--warm-400);margin-bottom:.5rem;">🏷 ${escHtml(b.genre)}</p>` : ''}
+          ${b.status === 'lendo' && b.totalPages ? `
+            <div class="progress-wrap">
+              <div class="progress-label"><span>Progresso</span><span>${b.currentPage||0}/${b.totalPages} pág. (${pct}%)</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+            </div>` : ''}
+          ${b.notes ? `<p style="font-size:.8rem;color:var(--warm-600);margin-top:.6rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">"${escHtml(b.notes)}"</p>` : ''}
+          <div class="book-card-actions">
+            <button class="btn btn-secondary btn-sm" onclick="openModal('${b._id}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Editar
+            </button>
+          </div>
+        </article>`;
+    }).join('')}</div>`;
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state"><span class="empty-state-icon">⚠️</span><h3>Erro ao carregar</h3><p>${err.message}</p></div>`;
+  }
+}
+
+/* ---- Modal ---- */
+let editingBook = null;
+
+async function openModal(bookId = null) {
+  editingBook = null;
+  currentRating = 0;
+  document.getElementById('bookId').value = '';
+  document.getElementById('bookForm').reset();
+  document.getElementById('bookFormErr').style.display = 'none';
+  document.getElementById('deleteBookBtn').style.display = 'none';
+  document.getElementById('modalTitle').textContent = 'Adicionar Livro';
+
+  // Init rating stars
+  initRatingInput(0);
+
+  if (bookId) {
+    try {
+      const res = await api.books.byId(bookId);
+      const b = res.data;
+      editingBook = b;
+      document.getElementById('modalTitle').textContent = 'Editar Livro';
+      document.getElementById('bookId').value = b._id;
+      document.getElementById('fTitle').value = b.title || '';
+      document.getElementById('fAuthor').value = b.author || '';
+      document.getElementById('fGenre').value = b.genre || '';
+      document.getElementById('fStatus').value = b.status || 'quero_ler';
+      document.getElementById('fCurrentPage').value = b.currentPage || '';
+      document.getElementById('fTotalPages').value = b.totalPages || '';
+      document.getElementById('fCoverUrl').value = b.coverUrl || '';
+      document.getElementById('fNotes').value = b.notes || '';
+      document.getElementById('fRating').value = b.rating || 0;
+      currentRating = b.rating || 0;
+      initRatingInput(currentRating);
+      document.getElementById('deleteBookBtn').style.display = 'inline-flex';
+    } catch (err) {
+      showToast('error', 'Erro ao carregar livro', err.message);
+      return;
+    }
+  }
+
+  document.getElementById('bookModal').classList.add('open');
+  document.getElementById('fTitle').focus();
+}
+
+function initRatingInput(val) {
+  currentRating = val;
+  const container = document.getElementById('ratingInput');
+  container.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const s = document.createElement('span');
+    s.className = 'star' + (i <= val ? ' filled' : '');
+    s.textContent = '★';
+    s.style.cssText = 'font-size:1.5rem;cursor:pointer;transition:color .15s;';
+    s.addEventListener('click', () => { currentRating = i; document.getElementById('fRating').value = i; initRatingInput(i); });
+    s.addEventListener('mouseover', () => { container.querySelectorAll('.star').forEach((st,idx) => st.classList.toggle('filled', idx < i)); });
+    s.addEventListener('mouseout', () => initRatingInput(currentRating));
+    container.appendChild(s);
+  }
+}
+
+function closeModal() {
+  document.getElementById('bookModal').classList.remove('open');
+}
+
+document.getElementById('closeModal').addEventListener('click', closeModal);
+document.getElementById('cancelBook').addEventListener('click', closeModal);
+document.getElementById('bookModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal(); });
+document.getElementById('addBookBtn').addEventListener('click', () => openModal());
+
+/* ---- Save ---- */
+document.getElementById('saveBookBtn').addEventListener('click', async () => {
+  const errEl = document.getElementById('bookFormErr');
+  errEl.style.display = 'none';
+
+  const title  = document.getElementById('fTitle').value.trim();
+  const author = document.getElementById('fAuthor').value.trim();
+  if (!title)  { errEl.textContent = 'Título é obrigatório'; errEl.style.display = 'block'; return; }
+  if (!author) { errEl.textContent = 'Autor é obrigatório'; errEl.style.display = 'block'; return; }
+
+  const payload = {
+    title, author,
+    genre:       document.getElementById('fGenre').value.trim(),
+    status:      document.getElementById('fStatus').value,
+    currentPage: parseInt(document.getElementById('fCurrentPage').value) || 0,
+    totalPages:  parseInt(document.getElementById('fTotalPages').value) || null,
+    coverUrl:    document.getElementById('fCoverUrl').value.trim(),
+    notes:       document.getElementById('fNotes').value.trim(),
+    rating:      parseFloat(document.getElementById('fRating').value) || 0
+  };
+
+  const btn = document.getElementById('saveBookBtn');
+  setLoading(btn, true);
+  try {
+    const id = document.getElementById('bookId').value;
+    if (id) {
+      await api.books.update(id, payload);
+      showToast('success', 'Livro atualizado!');
+    } else {
+      await api.books.create(payload);
+      showToast('success', 'Livro adicionado!');
+    }
+    closeModal();
+    loadBooks(currentFilter, document.getElementById('searchInput').value);
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+/* ---- Delete ---- */
+document.getElementById('deleteBookBtn').addEventListener('click', async () => {
+  const id = document.getElementById('bookId').value;
+  if (!id) return;
+  if (!confirm('Tem certeza que deseja excluir este livro?')) return;
+  try {
+    await api.books.delete(id);
+    showToast('success', 'Livro removido');
+    closeModal();
+    loadBooks(currentFilter, document.getElementById('searchInput').value);
+  } catch (err) {
+    showToast('error', 'Erro ao excluir', err.message);
+  }
+});
+
+/* ---- Filter chips ---- */
+document.querySelectorAll('.filter-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.status;
+    loadBooks(currentFilter, document.getElementById('searchInput').value);
+  });
+});
+
+/* ---- Search ---- */
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => loadBooks(currentFilter, e.target.value), 400);
+});
+
+/* ---- Util ---- */
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ---- Check URL param ---- */
+const urlParams = new URLSearchParams(window.location.search);
+const urlStatus = urlParams.get('status');
+const urlId = urlParams.get('id');
+
+if (urlStatus) {
+  document.querySelectorAll('.filter-chip').forEach(b => {
+    b.classList.toggle('active', b.dataset.status === urlStatus);
+  });
+  currentFilter = urlStatus;
+}
+
+loadBooks(currentFilter);
+
+if (urlId) {
+  setTimeout(() => openModal(urlId), 500);
+}
+</script>
+</body>
+</html>

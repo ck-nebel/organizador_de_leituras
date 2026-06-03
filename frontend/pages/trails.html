@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trilhas de Leitura</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .trail-detail { display:none; }
+    .trail-detail.open { display:block; }
+    .trail-list-view { }
+    .back-btn { display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--purple-600);background:none;border:none;cursor:pointer;margin-bottom:1.25rem;padding:.3rem 0; }
+    .back-btn:hover { text-decoration:underline; }
+    .status-select { font-size:.75rem;border:1.5px solid var(--warm-200);border-radius:99px;padding:.2rem .6rem;background:#fff;cursor:pointer;color:var(--warm-600); }
+    .trail-colors { display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.35rem; }
+    .trail-color-dot { width:26px;height:26px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:.15s; }
+    .trail-color-dot.selected { border-color:var(--ink);transform:scale(1.15); }
+    .trail-book-row { display:flex;align-items:center;gap:.6rem;padding:.55rem;border:1.5px solid var(--warm-100);border-radius:var(--radius-md);margin-bottom:.5rem;background:#fff; }
+    .trail-book-row-order { font-size:.75rem;font-weight:700;color:var(--purple-400);min-width:20px;text-align:center; }
+    .trail-book-row input { flex:1;border:none;outline:none;font-size:.875rem;color:var(--ink);background:transparent; }
+    .trail-book-row input::placeholder { color:var(--warm-300); }
+    .remove-book-btn { background:none;border:none;color:var(--warm-300);cursor:pointer;font-size:1rem;padding:.1rem .3rem; }
+    .remove-book-btn:hover { color:var(--danger); }
+    .add-trail-book-btn { display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--purple-600);background:var(--purple-50);border:1.5px dashed var(--purple-200);border-radius:var(--radius-md);padding:.5rem 1rem;width:100%;justify-content:center;cursor:pointer;margin-top:.25rem;transition:all .15s; }
+    .add-trail-book-btn:hover { background:var(--purple-100); }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><img src="/frontend/img/book.jpg"></div>
+      <div class="sidebar-logo-text">
+        <span class="title">Organizador</span>
+        <span class="subtitle">de leituras</span>
+      </div>
+    </div>
+    <ul class="sidebar-nav">
+      <li class="nav-section-label">Menu</li>
+      <li><a href="dashboard.html" class="nav-item"><span class="nav-item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span class="nav-item-label">Dashboard</span></a></li>
+      <li><a href="books.html" class="nav-item"><span class="nav-item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span class="nav-item-label">Meus Livros</span></a></li>
+      <li><a href="trails.html" class="nav-item active"><span class="nav-item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span class="nav-item-label">Trilhas</span></a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <div class="sidebar-user-avatar" id="sidebarUserInit">?</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebarUserName">Usuário</div>
+        <div class="sidebar-user-role">Leitor</div>
+      </div>
+      <button class="sidebar-logout logout-btn" title="Sair">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="topbar">
+      <span class="topbar-title" id="topbarTitle">Trilhas de Leitura</span>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" id="newTrailBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nova trilha
+        </button>
+      </div>
+    </header>
+
+    <main class="page">
+
+      <!-- TRAIL LIST VIEW -->
+      <div id="trailListView" class="trail-list-view">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Trilhas de Leitura</h1>
+            <p class="page-subtitle">Planos de leitura organizados por assunto</p>
+          </div>
+        </div>
+        <div id="trailsContainer">
+          <div class="page-loading"><div class="spinner"></div><span>Carregando trilhas...</span></div>
+        </div>
+      </div>
+
+      <!-- TRAIL DETAIL VIEW -->
+      <div id="trailDetailView" class="trail-detail">
+        <button class="back-btn" id="backToTrails">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Voltar para trilhas
+        </button>
+        <div id="trailDetailContent"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ===================== MODAL: CREATE/EDIT TRAIL ===================== -->
+<div class="modal-overlay" id="trailModal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <h3 class="modal-title" id="trailModalTitle">Nova Trilha</h3>
+      <button class="modal-close" id="closeTrailModal">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="trailForm" novalidate>
+        <input type="hidden" id="trailId">
+        <div class="form-group">
+          <label class="form-label" for="tTitle">Nome da trilha *</label>
+          <input class="form-control" id="tTitle" placeholder="Ex: Fundamentos de Programação">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="tSubject">Assunto / Área *</label>
+          <input class="form-control" id="tSubject" placeholder="Ex: Tecnologia, Filosofia, Negócios...">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="tDesc">Descrição (opcional)</label>
+          <textarea class="form-control" id="tDesc" rows="2" placeholder="Objetivo desta trilha de leitura..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cor de destaque</label>
+          <div class="trail-colors" id="trailColorPicker">
+            <!-- Populated by JS -->
+          </div>
+          <input type="hidden" id="tColor" value="#7C3AED">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Livros da trilha</label>
+          <div id="trailBooksList"></div>
+          <button type="button" class="add-trail-book-btn" id="addTrailBookBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Adicionar livro à trilha
+          </button>
+        </div>
+        <p class="error-msg" id="trailFormErr" style="display:none;"></p>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelTrail">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="deleteTrailBtn" style="display:none;margin-right:auto;">Excluir trilha</button>
+      <button class="btn btn-primary" id="saveTrailBtn">Salvar trilha</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script>window.API_BASE = 'http://localhost:5000/api';</script>
+<script src="../js/api.js"></script>
+<script>
+requireAuth();
+initSidebarUser();
+
+const COLORS = ['#7C3AED','#2563EB','#059669','#D97706','#DC2626','#0891B2','#7C3AED','#BE185D','#1D4ED8'];
+let trailColorValue = '#7C3AED';
+let trailBooks = [];
+
+/* ---- Trails list ---- */
+async function loadTrails() {
+  const container = document.getElementById('trailsContainer');
+  container.innerHTML = `<div class="page-loading"><div class="spinner"></div><span>Carregando...</span></div>`;
+  try {
+    const res = await api.trails.list();
+    const trails = res.data;
+    if (trails.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-state-icon">🗺️</span>
+          <h3>Nenhuma trilha criada</h3>
+          <p>Crie um plano de leitura para um assunto específico</p>
+          <button class="btn btn-primary btn-sm" style="margin-top:.75rem;" onclick="openTrailModal()">Criar primeira trilha</button>
+        </div>`;
+      return;
+    }
+    container.innerHTML = `<div class="books-grid">${trails.map(renderTrailCard).join('')}</div>`;
+  } catch(err) {
+    container.innerHTML = `<div class="empty-state"><span>⚠️</span><h3>Erro ao carregar</h3><p>${err.message}</p></div>`;
+  }
+}
+
+function renderTrailCard(t) {
+  const pct = t.progress || 0;
+  const concluded = t.books?.filter(b => b.status === 'concluido').length || 0;
+  return `
+    <div class="trail-card" onclick="openTrailDetail('${t._id}')">
+      <div class="trail-card-top" style="background:${t.coverColor||'#7C3AED'};height:6px;"></div>
+      <div class="trail-card-body">
+        <div class="trail-subject">${escHtml(t.subject)}</div>
+        <div class="trail-title">${escHtml(t.title)}</div>
+        ${t.description ? `<p style="font-size:.8rem;color:var(--warm-400);margin-top:.3rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escHtml(t.description)}</p>` : ''}
+        <div class="progress-wrap" style="margin-top:.85rem;">
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${t.coverColor||'#7C3AED'};"></div></div>
+        </div>
+        <div class="trail-progress-info">
+          <span class="trail-books-count">${concluded}/${t.books?.length||0} livros</span>
+          <span class="trail-pct" style="color:${t.coverColor||'#7C3AED'};">${pct}%</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ---- Trail Detail ---- */
+async function openTrailDetail(id) {
+  document.getElementById('trailListView').style.display = 'none';
+  document.getElementById('trailDetailView').classList.add('open');
+  document.getElementById('trailDetailContent').innerHTML = `<div class="page-loading"><div class="spinner"></div><span>Carregando trilha...</span></div>`;
+  document.getElementById('topbarTitle').textContent = 'Trilha';
+
+  try {
+    const res = await api.trails.byId(id);
+    renderTrailDetail(res.data);
+  } catch(err) {
+    document.getElementById('trailDetailContent').innerHTML = `<div class="empty-state"><h3>Erro ao carregar trilha</h3><p>${err.message}</p></div>`;
+  }
+}
+
+function renderTrailDetail(t) {
+  const pct = t.progress || 0;
+  const statusLabels = { pendente:'Pendente', em_andamento:'Em andamento', concluido:'Concluído' };
+  const statusColors = { pendente:'var(--warm-400)', em_andamento:'var(--info)', concluido:'var(--success)' };
+
+  const bookRows = (t.books||[]).sort((a,b) => a.order - b.order).map(b => `
+    <div class="trail-book-item" data-bookid="${b._id}">
+      <div class="trail-book-number ${b.status==='concluido'?'done':''}">${b.order}</div>
+      <div class="trail-book-info">
+        <div class="trail-book-name">${escHtml(b.title)}</div>
+        ${b.author ? `<div class="trail-book-auth">${escHtml(b.author)}</div>` : ''}
+        ${b.notes ? `<div style="font-size:.75rem;color:var(--warm-400);font-style:italic;">${escHtml(b.notes)}</div>` : ''}
+      </div>
+      <select class="status-select" onchange="updateBookStatus('${t._id}','${b._id}',this.value)" style="color:${statusColors[b.status]};">
+        <option value="pendente" ${b.status==='pendente'?'selected':''}>Pendente</option>
+        <option value="em_andamento" ${b.status==='em_andamento'?'selected':''}>Lendo</option>
+        <option value="concluido" ${b.status==='concluido'?'selected':''}>Concluído</option>
+      </select>
+    </div>`).join('');
+
+  document.getElementById('topbarTitle').textContent = t.title;
+  document.getElementById('trailDetailContent').innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+      <div>
+        <div class="trail-subject" style="color:${t.coverColor||'#7C3AED'};font-size:.8rem;">${escHtml(t.subject)}</div>
+        <h1 class="page-title" style="margin-top:.1rem;">${escHtml(t.title)}</h1>
+        ${t.description ? `<p style="margin-top:.35rem;max-width:500px;">${escHtml(t.description)}</p>` : ''}
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="openTrailModal('${t._id}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar trilha
+      </button>
+    </div>
+
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+          <span style="font-size:.85rem;font-weight:500;">Progresso geral</span>
+          <span style="font-size:1.1rem;font-weight:700;color:${t.coverColor||'#7C3AED'};">${pct}%</span>
+        </div>
+        <div class="progress-bar" style="height:8px;">
+          <div class="progress-fill" style="width:${pct}%;background:${t.coverColor||'#7C3AED'};"></div>
+        </div>
+        <p style="font-size:.78rem;color:var(--warm-400);margin-top:.5rem;">${(t.books||[]).filter(b=>b.status==='concluido').length} de ${t.books?.length||0} livros concluídos</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <h3 style="font-size:1rem;">📋 Livros da trilha</h3>
+        <span style="font-size:.78rem;color:var(--warm-400);">${t.books?.length||0} livros</span>
+      </div>
+      <div class="card-body">
+        ${bookRows || `<div class="empty-state" style="padding:1.5rem;"><span class="empty-state-icon">📖</span><p>Nenhum livro nesta trilha</p></div>`}
+        <div class="trail-book-list">
+          <!-- populated above -->
+        </div>
+      </div>
+    </div>`;
+}
+
+async function updateBookStatus(trailId, bookId, status) {
+  try {
+    const res = await api.trails.updateBook(trailId, bookId, status);  // bookId, não book._id
+    showToast('success', 'Status atualizado!');
+    renderTrailDetail(res.data);
+  } catch(err) {
+    showToast('error', 'Erro ao atualizar', err.message);
+  }
+}
+
+
+/* ---- Back button ---- */
+document.getElementById('backToTrails').addEventListener('click', () => {
+  document.getElementById('trailDetailView').classList.remove('open');
+  document.getElementById('trailListView').style.display = '';
+  document.getElementById('topbarTitle').textContent = 'Trilhas de Leitura';
+  loadTrails();
+});
+
+/* ---- Trail Modal ---- */
+function initColorPicker(selected) {
+  const picker = document.getElementById('trailColorPicker');
+  picker.innerHTML = COLORS.map(c => `
+    <div class="trail-color-dot${c===selected?' selected':''}" style="background:${c};" data-color="${c}" onclick="selectColor('${c}')"></div>`).join('');
+  trailColorValue = selected;
+  document.getElementById('tColor').value = selected;
+}
+
+function selectColor(c) {
+  trailColorValue = c;
+  document.getElementById('tColor').value = c;
+  document.querySelectorAll('.trail-color-dot').forEach(d => d.classList.toggle('selected', d.dataset.color === c));
+}
+
+function addTrailBookRow(book = {}) {
+  const idx = trailBooks.length;
+  const novoLivro = { title: book.title||'', author: book.author||'', order: idx+1, status: book.status||'pendente', notes: book.notes||'' };
+  if (book._id) novoLivro._id = book._id; // só inclui _id se já existir (livro salvo no banco)
+  trailBooks.push(novoLivro);
+  renderTrailBookRows();
+}
+
+function removeTrailBookRow(idx) {
+  trailBooks.splice(idx, 1);
+  trailBooks.forEach((b,i) => b.order = i+1);
+  renderTrailBookRows();
+}
+
+function renderTrailBookRows() {
+  const list = document.getElementById('trailBooksList');
+  list.innerHTML = trailBooks.map((b, i) => `
+    <div class="trail-book-row">
+      <span class="trail-book-row-order">${i+1}</span>
+      <div style="flex:1;min-width:0;">
+        <input value="${escHtml(b.title)}" placeholder="Título do livro *" oninput="trailBooks[${i}].title=this.value" style="width:100%;margin-bottom:.2rem;">
+        <input value="${escHtml(b.author)}" placeholder="Autor (opcional)" oninput="trailBooks[${i}].author=this.value" style="width:100%;font-size:.8rem;color:var(--warm-400);">
+        <input value="${escHtml(b.notes)}" placeholder="Nota (opcional)" oninput="trailBooks[${i}].notes=this.value" style="width:100%;font-size:.78rem;color:var(--warm-300);">
+      </div>
+      <button class="remove-book-btn" onclick="removeTrailBookRow(${i})" title="Remover">×</button>
+    </div>`).join('');
+}
+
+async function openTrailModal(trailId = null) {
+  trailBooks = [];
+  document.getElementById('trailId').value = '';
+  document.getElementById('trailForm').reset();
+  document.getElementById('trailFormErr').style.display = 'none';
+  document.getElementById('deleteTrailBtn').style.display = 'none';
+  document.getElementById('trailModalTitle').textContent = 'Nova Trilha';
+  initColorPicker('#7C3AED');
+  renderTrailBookRows();
+
+  if (trailId) {
+    try {
+      const res = await api.trails.byId(trailId);
+      const t = res.data;
+      document.getElementById('trailModalTitle').textContent = 'Editar Trilha';
+      document.getElementById('trailId').value = t._id;
+      document.getElementById('tTitle').value = t.title||'';
+      document.getElementById('tSubject').value = t.subject||'';
+      document.getElementById('tDesc').value = t.description||'';
+      initColorPicker(t.coverColor||'#7C3AED');
+      trailBooks = (t.books||[]).sort((a,b) => a.order-b.order).map(b => ({...b}));
+      renderTrailBookRows();
+      document.getElementById('deleteTrailBtn').style.display = 'inline-flex';
+    } catch(err) {
+      showToast('error','Erro ao carregar trilha',err.message); return;
+    }
+  }
+
+  document.getElementById('trailModal').classList.add('open');
+}
+
+function closeTrailModal() {
+  document.getElementById('trailModal').classList.remove('open');
+}
+
+document.getElementById('closeTrailModal').addEventListener('click', closeTrailModal);
+document.getElementById('cancelTrail').addEventListener('click', closeTrailModal);
+document.getElementById('trailModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeTrailModal(); });
+document.getElementById('newTrailBtn').addEventListener('click', () => openTrailModal());
+document.getElementById('addTrailBookBtn').addEventListener('click', () => addTrailBookRow());
+
+/* ---- Save Trail ---- */
+document.getElementById('saveTrailBtn').addEventListener('click', async () => {
+  const errEl = document.getElementById('trailFormErr');
+  errEl.style.display = 'none';
+  const title   = document.getElementById('tTitle').value.trim();
+  const subject = document.getElementById('tSubject').value.trim();
+  if (!title)   { errEl.textContent='Nome da trilha é obrigatório'; errEl.style.display='block'; return; }
+  if (!subject) { errEl.textContent='Assunto é obrigatório'; errEl.style.display='block'; return; }
+
+  // Validate books
+  for (let i=0; i<trailBooks.length; i++) {
+    if (!trailBooks[i].title.trim()) {
+      errEl.textContent = `Informe o título do livro ${i+1}`;
+      errEl.style.display = 'block';
+      return;
+    }
+  }
+
+  const payload = {
+    title, subject,
+    description: document.getElementById('tDesc').value.trim(),
+    coverColor: document.getElementById('tColor').value,
+    books: trailBooks.map((b,i) => {
+      const livro = { title: b.title.trim(), author: b.author.trim(), order: i+1, status: b.status||'pendente', notes: b.notes||'' };
+      if (b._id) livro._id = b._id; // só envia _id se for um livro já salvo
+      return livro;
+    })
+  };
+
+  const btn = document.getElementById('saveTrailBtn');
+  setLoading(btn, true);
+  try {
+    const id = document.getElementById('trailId').value;
+    if (id) {
+      await api.trails.update(id, payload);
+      showToast('success','Trilha atualizada!');
+    } else {
+      await api.trails.create(payload);
+      showToast('success','Trilha criada!');
+    }
+    closeTrailModal();
+    // Reload
+    if (document.getElementById('trailDetailView').classList.contains('open')) {
+      const tId = document.getElementById('trailId').value;
+      if (tId) openTrailDetail(tId);
+    } else {
+      loadTrails();
+    }
+  } catch(err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+/* ---- Delete Trail ---- */
+document.getElementById('deleteTrailBtn').addEventListener('click', async () => {
+  const id = document.getElementById('trailId').value;
+  if (!confirm('Excluir esta trilha?')) return;
+  try {
+    await api.trails.delete(id);
+    showToast('success','Trilha removida');
+    closeTrailModal();
+    document.getElementById('trailDetailView').classList.remove('open');
+    document.getElementById('trailListView').style.display = '';
+    document.getElementById('topbarTitle').textContent = 'Trilhas de Leitura';
+    loadTrails();
+  } catch(err) {
+    showToast('error','Erro ao excluir',err.message);
+  }
+});
+
+/* ---- URL param ---- */
+const urlId = new URLSearchParams(window.location.search).get('id');
+if (urlId) {
+  loadTrails();
+  openTrailDetail(urlId);
+} else {
+  loadTrails();
+}
+
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
