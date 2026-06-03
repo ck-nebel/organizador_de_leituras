@@ -139,3 +139,6 @@ Leitores em geral, estudantes e qualquer pessoa que queira organizar sua bibliot
 * `PUT /api/trails/:id` — Atualiza os dados de uma trilha.
 * `DELETE /api/trails/:id` — Remove uma trilha.
 * `PATCH /api/trails/:id/books/:bookId/status` — Atualiza o status de um livro dentro de uma trilha.
+
+## Deploy
+Link: (https://organizador-de-leituras-frontend.vercel.app)
