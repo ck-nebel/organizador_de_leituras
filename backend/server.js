@@ -14,6 +14,7 @@ const app = express();
 app.use(cors({
   origin: 'https://organizador-de-leituras-frontend.vercel.app' // Depois do deploy, troque pelo domínio exato do seu frontend
 }));
+app.options('*', cors());
 
 app.use(express.json());
 
