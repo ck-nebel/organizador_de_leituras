@@ -39,7 +39,6 @@ app.use((req, res) => {
 
 app.use(errorHandler);
 
-// ✅ CORREÇÃO 2 — Exportar o app para o Vercel funcionar
 const PORT = process.env.PORT || 5000;
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
