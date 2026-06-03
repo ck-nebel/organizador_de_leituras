@@ -12,7 +12,7 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 app.use(cors({
-  origin: '*' // Depois do deploy, troque pelo domínio exato do seu frontend
+  origin: 'https://organizador-de-leituras-frontend.vercel.app/' // Depois do deploy, troque pelo domínio exato do seu frontend
 }));
 
 app.use(express.json());
