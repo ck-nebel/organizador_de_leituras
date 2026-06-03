@@ -75,7 +75,7 @@ Leitores em geral, estudantes e qualquer pessoa que queira organizar sua bibliot
 1. Clone o repositório:
    ```bash
    git clone <url-do-repositorio>
-   cd organizador_livros/backend
+   cd organizador_de_leituras/backend
    ```
 
 2. Instale as dependências:
@@ -103,7 +103,7 @@ Leitores em geral, estudantes e qualquer pessoa que queira organizar sua bibliot
 
 1. Acesse a pasta do frontend:
    ```bash
-   cd organizador_livros/frontend
+   cd organizador_de_leituras/frontend
    ```
 
 2. Sirva os arquivos localmente usando a extensão **Live Server** no VS Code ou um servidor HTTP simples:
